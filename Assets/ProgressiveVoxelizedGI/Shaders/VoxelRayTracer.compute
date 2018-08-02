@@ -1,0 +1,151 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Readable/Writeable texture for direct lighting color and occupied flag
+RWTexture3D<float4> voxelGridProgressive;
+
+// Readable/Writeable texture for world space normal
+RWTexture3D<float4> voxelGridNormal;
+
+// Readable/Writeable texture for storing the computed irradiance after ray tracing
+RWTexture3D<float4> voxelGridIrradiance;
+
+// World-space position
+Texture2D<float4> positionTexture;
+
+// World-space normal
+Texture2D<float4> normalTexture;
+
+// World-space boundary of the voxel grid
+float worldVolumeBoundary;
+
+// Maximum distance till which the ray will be traced
+float rayDistance;
+
+// Maximum number of iterations for the ray tracing loop
+float maximumIterations;
+
+// Dimension of the voxel grid
+uint voxelVolumeDimension;
+
+// Function to get position of voxel in the grid
+inline uint3 GetVoxelPosition (float3 worldPosition)
+{
+	float3 encodedPosition = worldPosition / worldVolumeBoundary;
+	encodedPosition += float3(1.0f, 1.0f, 1.0f);
+	encodedPosition /= 2.0f;
+	uint3 voxelPosition = (uint3)(encodedPosition * voxelVolumeDimension);
+	return voxelPosition;
+}
+
+// Function to get position of voxel in world space
+inline float3 GetWorldPosition (uint3 voxelPosition)
+{
+	float3 worldPosition = ((float3)voxelPosition / (float)voxelVolumeDimension);
+	worldPosition *= 2.0f;
+	worldPosition -= float3(1.0f, 1.0f, 1.0f);
+	worldPosition *= worldVolumeBoundary;
+	return worldPosition;
+}
+
+// Traces a ray starting from the current voxel in the reflected ray direction and accumulates color
+inline float4 RayTrace(float3 origin, float3 direction, float3 normal)
+{
+	float4 accumulatedColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float3 currentPosition = float3(0.0f, 0.0f, 0.0f);
+	uint3 currentVoxelPosition = uint3(0, 0, 0);
+	uint3 originVoxelPosition = GetVoxelPosition(origin);
+	float4 currentVoxelInfo = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float hitFound = 0.0f;
+	float isNotOrigin = 0.0f;
+	float rayStep = rayDistance / maximumIterations;
+
+	// Loop for tracing the ray through the scene
+	for (float i = 1.0f; i < maximumIterations; i += 1.0f)
+	{	
+		// Traverse the ray in the reflected direction
+		currentPosition = (origin + (direction * rayStep * i));
+
+		// Get the currently hit voxel's information
+		currentVoxelInfo = voxelGridProgressive[GetVoxelPosition(currentPosition)];
+
+		float3 surfaceToLight = (rayStep * i * direction);
+		float distSq = max(0.1f, dot(surfaceToLight, surfaceToLight));
+		float atten = 1.0f / (distSq);
+		surfaceToLight = normalize(surfaceToLight);
+
+		float brightness = (max(0.0f, dot(normal, surfaceToLight)));
+		brightness *= atten;
+
+		isNotOrigin = saturate(abs(((float)currentVoxelPosition.x - (float)originVoxelPosition.x) + ((float)currentVoxelPosition.y - (float)originVoxelPosition.y) + ((float)currentVoxelPosition.z - (float)originVoxelPosition.z)));
+
+		float condition = currentVoxelInfo.w * (1.0f - hitFound) * isNotOrigin;
+		accumulatedColor.rgb += (brightness * currentVoxelInfo.xyz * condition);
+		accumulatedColor.a += condition;
+		hitFound += condition;
+	}
+
+	return accumulatedColor;
+}
+
+inline float3 HemisphereTrace (float3 origin, float3 normal)
+{
+	float4 accumulatedColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	float3 normalDirection = normalize(normal);
+
+	// Random vector so that the cross product does not become zero
+	float3 randomVector = float3(1.0f, 2.0f, 3.0f);
+	randomVector = normalize(randomVector);
+
+	// Displacement vectors along which the sample points will be computed
+	float3 displacementVector1 = normalize(cross(normalDirection, randomVector));
+	float3 displacementVector2 = -displacementVector1;
+	float3 displacementVector3 = normalize(cross(normalDirection, displacementVector1));
+	float3 displacementVector4 = -displacementVector3;
+
+	float separationFactor1 = 0.25f;
+	float separationFactor2 = 0.5f;
+	float separationFactor3 = 0.75f;
+
+	float3 direction1 = normalize(normalDirection);
+	float3 direction2 = normalize(lerp(normalDirection, displacementVector1, separationFactor1));
+	float3 direction3 = normalize(lerp(normalDirection, displacementVector2, separationFactor1));
+	float3 direction4 = normalize(lerp(normalDirection, displacementVector3, separationFactor1));
+	float3 direction5 = normalize(lerp(normalDirection, displacementVector4, separationFactor1));
+	float3 direction6 = normalize(lerp(normalDirection, displacementVector1, separationFactor2));
+	float3 direction7 = normalize(lerp(normalDirection, displacementVector2, separationFactor2));
+	float3 direction8 = normalize(lerp(normalDirection, displacementVector3, separationFactor2));
+	float3 direction9 = normalize(lerp(normalDirection, displacementVector4, separationFactor2));
+	float3 direction10 = normalize(lerp(normalDirection, displacementVector1, separationFactor3));
+	float3 direction11 = normalize(lerp(normalDirection, displacementVector2, separationFactor3));
+	float3 direction12 = normalize(lerp(normalDirection, displacementVector3, separationFactor3));
+	float3 direction13 = normalize(lerp(normalDirection, displacementVector4, separationFactor3));
+
+	accumulatedColor += RayTrace(origin, direction1, normal);
+	accumulatedColor += RayTrace(origin, direction2, normal);
+	accumulatedColor += RayTrace(origin, direction3, normal);
+	accumulatedColor += RayTrace(origin, direction4, normal);
+	accumulatedColor += RayTrace(origin, direction5, normal);
+	accumulatedColor += RayTrace(origin, direction6, normal);
+	accumulatedColor += RayTrace(origin, direction7, normal);
+	accumulatedColor += RayTrace(origin, direction8, normal);
+	accumulatedColor += RayTrace(origin, direction9, normal);
+	accumulatedColor += RayTrace(origin, direction10, normal);
+	accumulatedColor += RayTrace(origin, direction11, normal);
+	accumulatedColor += RayTrace(origin, direction12, normal);
+	accumulatedColor += RayTrace(origin, direction13, normal);
+
+	return accumulatedColor.rgb;
+
+}
+
+[numthreads(1,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float3 origin = GetWorldPosition(id.xyz);
+	float3 normal = voxelGridNormal[id.xyz].rgb;
+
+	float3 irradiance = HemisphereTrace(origin, normal);
+	voxelGridIrradiance[id.xyz] = float4(irradiance, 1.0f);
+}

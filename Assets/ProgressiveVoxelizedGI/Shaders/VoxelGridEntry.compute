@@ -1,0 +1,65 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Readable/Writable texture for storing the direct lighting and the occupied flag
+RWTexture3D<float4>			voxelGridProgressive;
+
+// Readable/Writable texture for storing the world normal
+RWTexture3D<float4>			voxelGridNormal;
+
+// Texture for storing the color with direct lighting
+Texture2D<float4>			lightingTexture;
+
+// Texture for storing the world space position
+Texture2D<float4>			positionTexture;
+
+// Texture for storing the world space position
+Texture2D<float4>			normalTexture;
+
+// Depth till which voxels will be injected to prevent inaccurate VPLs
+float 						voxelizationDepth;
+
+// Variable representing the dimension of the voxel grid
+uint						voxelVolumeDimension;
+
+// World-space boundary of the voxel grid
+float 						worldVolumeBoundary;
+
+// Function to get position of voxel in the grid
+inline uint3 GetVoxelPosition (float3 worldPosition)
+{
+	float3 encodedPosition = worldPosition / worldVolumeBoundary;
+	encodedPosition += float3(1.0f, 1.0f, 1.0f);
+	encodedPosition /= 2.0f;
+	uint3 voxelPosition = (uint3)(encodedPosition * voxelVolumeDimension);
+	return voxelPosition;
+}
+
+[numthreads(1, 1, 1)]
+// Entry point of the voxelization compute shader
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	// Color of the current voxel with lighting
+	float3 lightingColor = lightingTexture[id.xy].rgb;
+
+	// World space position
+	float3 worldPosition = positionTexture[id.xy].rgb;
+
+	// World space normal
+	float3 worldNormal = normalTexture[id.xy].rgb;
+
+	// Extract the pixel's depth
+	float lindepth = positionTexture[id.xy].a;
+
+	// Inject the current voxel's information into the grid
+	if (lindepth < voxelizationDepth)
+	{
+		uint3 voxelPosition = GetVoxelPosition(worldPosition);
+
+		if (voxelGridProgressive[voxelPosition].a < 0.1f)
+		{
+			voxelGridProgressive[voxelPosition] = float4(lightingColor, 1.0f);
+			voxelGridNormal[voxelPosition] = float4(worldNormal, 1.0f);
+		}
+	}
+}
