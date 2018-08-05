@@ -92,9 +92,9 @@ public class PVGI : MonoBehaviour {
 		voxelGrid.voxelGridIrradiance = new RenderTexture (voxelGridDescriptorFloat4);
 		voxelGrid.voxelGridNormal = new RenderTexture (voxelGridDescriptorFloat4);
 
-		voxelGrid.voxelGridProgressive.filterMode = FilterMode.Bilinear;
-		voxelGrid.voxelGridIrradiance.filterMode = FilterMode.Bilinear;
-		voxelGrid.voxelGridNormal.filterMode = FilterMode.Bilinear;
+		voxelGrid.voxelGridProgressive.filterMode = FilterMode.Trilinear;
+		voxelGrid.voxelGridIrradiance.filterMode = FilterMode.Trilinear;
+		voxelGrid.voxelGridNormal.filterMode = FilterMode.Trilinear;
 
 		voxelGrid.voxelGridProgressive.Create ();
 		voxelGrid.voxelGridIrradiance.Create ();

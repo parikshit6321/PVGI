@@ -579,8 +579,6 @@ GameObject:
   - component: {fileID: 725661634}
   - component: {fileID: 725661633}
   - component: {fileID: 725661631}
-  - component: {fileID: 725661630}
-  - component: {fileID: 725661629}
   m_Layer: 0
   m_Name: FirstPersonCharacter
   m_TagString: MainCamera
@@ -601,31 +599,6 @@ Transform:
   m_Father: {fileID: 404395970}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &725661629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 725661627}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1eed1d9cbe64423499f1fefc0ce50417, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Resolution: 1
-  DefaultSpotCookie: {fileID: 0}
---- !u!114 &725661630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 725661627}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: dcda1c9bd4c670c4ab3b121a0ac42abd, type: 2}
 --- !u!114 &725661631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,12 +620,12 @@ MonoBehaviour:
   voxelGridRayTracerShader: {fileID: 7200000, guid: 9b941a866851f314a964e263f0a1f86b,
     type: 3}
   resolution: {x: 1920, y: 1080}
-  indirectLightingStrength: 6
+  indirectLightingStrength: 1
   worldVolumeBoundary: 50
   voxelVolumeDimension: 16
   voxelizationDepth: 0.015
-  rayDistance: 40
-  maximumIterations: 12
+  rayDistance: 20
+  maximumIterations: 15
 --- !u!124 &725661633
 Behaviour:
   m_ObjectHideFlags: 0

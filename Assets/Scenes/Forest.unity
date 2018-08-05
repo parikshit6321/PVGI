@@ -15432,8 +15432,8 @@ MonoBehaviour:
   worldVolumeBoundary: 50
   voxelVolumeDimension: 16
   voxelizationDepth: 0.015
-  rayDistance: 40
-  maximumIterations: 30
+  rayDistance: 20
+  maximumIterations: 15
 --- !u!1001 &1413720567
 Prefab:
   m_ObjectHideFlags: 0
