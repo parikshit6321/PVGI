@@ -80,52 +80,46 @@
 			return float4(worldPos, lindepth);
 		}
 
-		// Returns the voxel information from grid 1
-		inline float4 GetVoxelInfo1(float3 worldPosition)
+		// Returns the voxel position in the grids
+		inline float3 GetVoxelPosition(float3 worldPosition)
 		{
 			float3 voxelPosition = worldPosition / worldVolumeBoundary;
 			voxelPosition += float3(1.0f, 1.0f, 1.0f);
 			voxelPosition /= 2.0f;
+			return voxelPosition;
+		}
+
+		// Returns the voxel information from grid 1
+		inline float4 GetVoxelInfo1(float3 voxelPosition)
+		{
 			float4 info = tex3D(voxelGrid1, voxelPosition);
 			return info;
 		}
 
 		// Returns the voxel information from grid 2
-		inline float4 GetVoxelInfo2(float3 worldPosition)
+		inline float4 GetVoxelInfo2(float3 voxelPosition)
 		{
-			float3 voxelPosition = worldPosition / worldVolumeBoundary;
-			voxelPosition += float3(1.0f, 1.0f, 1.0f);
-			voxelPosition /= 2.0f;
 			float4 info = tex3D(voxelGrid2, voxelPosition);
 			return info;
 		}
 
 		// Returns the voxel information from grid 3
-		inline float4 GetVoxelInfo3(float3 worldPosition)
+		inline float4 GetVoxelInfo3(float3 voxelPosition)
 		{
-			float3 voxelPosition = worldPosition / worldVolumeBoundary;
-			voxelPosition += float3(1.0f, 1.0f, 1.0f);
-			voxelPosition /= 2.0f;
 			float4 info = tex3D(voxelGrid3, voxelPosition);
 			return info;
 		}
 
 		// Returns the voxel information from grid 4
-		inline float4 GetVoxelInfo4(float3 worldPosition)
+		inline float4 GetVoxelInfo4(float3 voxelPosition)
 		{
-			float3 voxelPosition = worldPosition / worldVolumeBoundary;
-			voxelPosition += float3(1.0f, 1.0f, 1.0f);
-			voxelPosition /= 2.0f;
 			float4 info = tex3D(voxelGrid4, voxelPosition);
 			return info;
 		}
 
 		// Returns the voxel information from grid 5
-		inline float4 GetVoxelInfo5(float3 worldPosition)
+		inline float4 GetVoxelInfo5(float3 voxelPosition)
 		{
-			float3 voxelPosition = worldPosition / worldVolumeBoundary;
-			voxelPosition += float3(1.0f, 1.0f, 1.0f);
-			voxelPosition /= 2.0f;
 			float4 info = tex3D(voxelGrid5, voxelPosition);
 			return info;
 		}
@@ -145,27 +139,68 @@
 			float4 voxelInfo = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 			#if defined(GRID_1)
-			voxelInfo = GetVoxelInfo1(worldPos);
+			voxelInfo = GetVoxelInfo1(GetVoxelPosition(worldPos));
 			#endif
 
 			#if defined(GRID_2)
-			voxelInfo = GetVoxelInfo2(worldPos);
+			voxelInfo = GetVoxelInfo2(GetVoxelPosition(worldPos));
 			#endif
 
 			#if defined(GRID_3)
-			voxelInfo = GetVoxelInfo3(worldPos);
+			voxelInfo = GetVoxelInfo3(GetVoxelPosition(worldPos));
 			#endif
 
 			#if defined(GRID_4)
-			voxelInfo = GetVoxelInfo4(worldPos);
+			voxelInfo = GetVoxelInfo4(GetVoxelPosition(worldPos));
 			#endif
 
 			#if defined(GRID_5)
-			voxelInfo = GetVoxelInfo5(worldPos);
+			voxelInfo = GetVoxelInfo5(GetVoxelPosition(worldPos));
 			#endif
 
 			float3 resultingColor = (voxelInfo.a > 0.0f ? voxelInfo.rgb : float3(0.0f, 0.0f, 0.0f));
 			return float4(resultingColor, 1.0f);
+		}
+
+		inline float3 ComputeIndirectContribution(float3 worldPosition, float3 worldNormal)
+		{
+			float3 accumulatedColor = float3(0.0f, 0.0f, 0.0f);
+
+			return accumulatedColor;
+		}
+
+		float4 frag_lighting (v2f i) : SV_Target
+		{
+			float3 directLighting = tex2D(_MainTex, i.uv).rgb;
+
+			float4 gBufferSample = tex2D(_CameraGBufferTexture0, i.uv);
+			float3 albedo = gBufferSample.rgb;
+			float ao = gBufferSample.a;
+
+			float metallic = tex2D (_CameraGBufferTexture1, i.uv).r;
+
+			// read low res depth and reconstruct world position
+			float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
+			
+			//linearise depth		
+			float lindepth = Linear01Depth (depth);
+			
+			//get view and then world positions		
+			float4 viewPos = float4(i.cameraRay.xyz * lindepth, 1.0f);
+			float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;
+
+			float depthValue;
+			float3 viewSpaceNormal;
+			DecodeDepthNormal(tex2D(_CameraDepthNormalsTexture, i.uv), depthValue, viewSpaceNormal);
+			viewSpaceNormal = normalize(viewSpaceNormal);
+			float3 worldSpaceNormal = mul((float3x3)InverseViewMatrix, viewSpaceNormal);
+			worldSpaceNormal = normalize(worldSpaceNormal);
+
+			float3 indirectLighting = ((ao * indirectLightingStrength * (1.0f - metallic) * albedo) / PI) * ComputeIndirectContribution(worldPos, worldSpaceNormal);
+
+			float3 finalLighting = directLighting + indirectLighting;
+
+			return float4(finalLighting, 1.0f);
 		}
 
 		ENDCG
@@ -176,6 +211,7 @@
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag_position
+			#pragma target 5.0
 			ENDCG
 		}
 
@@ -186,6 +222,17 @@
 			#pragma vertex vert
 			#pragma fragment frag_debug
 			#pragma multi_compile GRID_1 GRID_2 GRID_3 GRID_4 GRID_5
+			#pragma target 5.0
+			ENDCG
+		}
+
+		// 2 : Lighting pass
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag_lighting
+			#pragma target 5.0
 			ENDCG
 		}
 	}

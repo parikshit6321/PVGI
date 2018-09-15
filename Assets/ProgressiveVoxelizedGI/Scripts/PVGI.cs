@@ -228,7 +228,7 @@ public class PVGI : MonoBehaviour {
 
 			Graphics.Blit (source, destination, pvgiMaterial, 1);
 		} else {
-			Graphics.Blit (source, destination);
+			Graphics.Blit (source, destination, pvgiMaterial, 2);
 		}
 
 	}
