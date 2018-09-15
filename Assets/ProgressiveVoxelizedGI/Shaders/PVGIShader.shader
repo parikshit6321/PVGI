@@ -15,9 +15,11 @@
 
 		#define PI 3.1415926f
 
-		uniform sampler3D				voxelGridProgressive;
-		uniform sampler3D				voxelGridIrradiance;
-		uniform sampler3D				voxelGridNormal;
+		uniform sampler3D				voxelGrid1;
+		uniform sampler3D				voxelGrid2;
+		uniform sampler3D				voxelGrid3;
+		uniform sampler3D				voxelGrid4;
+		uniform sampler3D				voxelGrid5;
 
 		uniform sampler2D 				_MainTex;
 		uniform sampler2D				_IndirectTex;
@@ -34,7 +36,7 @@
 		uniform float					worldVolumeBoundary;
 		uniform float					indirectLightingStrength;
 
-		uniform int						voxelVolumeDimension;
+		uniform int						highestVoxelResolution;
 
 		struct appdata
 		{
@@ -63,14 +65,6 @@
 			return o;
 		}
 
-		float3 EncodePosition (float3 inputPosition)
-		{
-			float3 encodedPosition = inputPosition / worldVolumeBoundary;
-			encodedPosition += float3(1.0f, 1.0f, 1.0f);
-			encodedPosition /= 2.0f;
-			return encodedPosition;
-		}
-
 		float4 frag_position (v2f i) : SV_Target
 		{
 			// read low res depth and reconstruct world position
@@ -86,48 +80,57 @@
 			return float4(worldPos, lindepth);
 		}
 
-		float4 frag_normal (v2f i) : SV_Target
+		// Returns the voxel information from grid 1
+		inline float4 GetVoxelInfo1(float3 worldPosition)
 		{
-			float depthValue;
-			float3 viewSpaceNormal;
-			DecodeDepthNormal(tex2D(_CameraDepthNormalsTexture, i.uv), depthValue, viewSpaceNormal);
-			viewSpaceNormal = normalize(viewSpaceNormal);
-			float3 worldSpaceNormal = mul((float3x3)InverseViewMatrix, viewSpaceNormal);
-			worldSpaceNormal = normalize(worldSpaceNormal);
-			return float4(worldSpaceNormal, 1.0f);
-		}
-
-		// Returns the voxel information from grid
-		inline float4 GetVoxelInfo(float3 voxelPosition)
-		{
-			float4 info = tex3D(voxelGridProgressive, voxelPosition);
+			float3 voxelPosition = worldPosition / worldVolumeBoundary;
+			voxelPosition += float3(1.0f, 1.0f, 1.0f);
+			voxelPosition /= 2.0f;
+			float4 info = tex3D(voxelGrid1, voxelPosition);
 			return info;
 		}
 
-		// Returns the world-space normal stored in the voxel
-		inline float3 GetVoxelNormal(float3 voxelPosition)
+		// Returns the voxel information from grid 2
+		inline float4 GetVoxelInfo2(float3 worldPosition)
 		{
-			float3 worldNormal = tex3D(voxelGridNormal, voxelPosition).rgb;
-			return worldNormal;
+			float3 voxelPosition = worldPosition / worldVolumeBoundary;
+			voxelPosition += float3(1.0f, 1.0f, 1.0f);
+			voxelPosition /= 2.0f;
+			float4 info = tex3D(voxelGrid2, voxelPosition);
+			return info;
 		}
 
-		// Returns the irradiance stored in the voxel
-		inline float3 GetVoxelIrradiance(float3 voxelPosition)
+		// Returns the voxel information from grid 3
+		inline float4 GetVoxelInfo3(float3 worldPosition)
 		{
-			float3 irradiance = tex3D(voxelGridIrradiance, voxelPosition).rgb;
-			return irradiance;
+			float3 voxelPosition = worldPosition / worldVolumeBoundary;
+			voxelPosition += float3(1.0f, 1.0f, 1.0f);
+			voxelPosition /= 2.0f;
+			float4 info = tex3D(voxelGrid3, voxelPosition);
+			return info;
 		}
 
-		// Function to get position of voxel in the grid
-		inline float3 GetVoxelPosition (float3 worldPosition)
+		// Returns the voxel information from grid 4
+		inline float4 GetVoxelInfo4(float3 worldPosition)
 		{
-			float3 encodedPosition = worldPosition / worldVolumeBoundary;
-			encodedPosition += float3(1.0f, 1.0f, 1.0f);
-			encodedPosition /= 2.0f;
-			return encodedPosition;
+			float3 voxelPosition = worldPosition / worldVolumeBoundary;
+			voxelPosition += float3(1.0f, 1.0f, 1.0f);
+			voxelPosition /= 2.0f;
+			float4 info = tex3D(voxelGrid4, voxelPosition);
+			return info;
 		}
 
-		float4 frag_debug_progressive (v2f i) : SV_Target
+		// Returns the voxel information from grid 5
+		inline float4 GetVoxelInfo5(float3 worldPosition)
+		{
+			float3 voxelPosition = worldPosition / worldVolumeBoundary;
+			voxelPosition += float3(1.0f, 1.0f, 1.0f);
+			voxelPosition /= 2.0f;
+			float4 info = tex3D(voxelGrid5, voxelPosition);
+			return info;
+		}
+
+		float4 frag_debug (v2f i) : SV_Target
 		{
 			// read low res depth and reconstruct world position
 			float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
@@ -139,71 +142,30 @@
 			float4 viewPos = float4(i.cameraRay.xyz * lindepth, 1.0f);
 			float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;
 
-			float4 voxelInfo = GetVoxelInfo(GetVoxelPosition(worldPos));
-			return voxelInfo;
+			float4 voxelInfo = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-		}
+			#if defined(GRID_1)
+			voxelInfo = GetVoxelInfo1(worldPos);
+			#endif
 
-		float4 frag_debug_normal (v2f i) : SV_Target
-		{
-			// read low res depth and reconstruct world position
-			float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-			
-			//linearise depth		
-			float lindepth = Linear01Depth (depth);
-			
-			//get view and then world positions		
-			float4 viewPos = float4(i.cameraRay.xyz * lindepth, 1.0f);
-			float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;
+			#if defined(GRID_2)
+			voxelInfo = GetVoxelInfo2(worldPos);
+			#endif
 
-			float3 voxelNormal = GetVoxelNormal(GetVoxelPosition(worldPos));
-			return float4(voxelNormal, 1.0f);
+			#if defined(GRID_3)
+			voxelInfo = GetVoxelInfo3(worldPos);
+			#endif
 
-		}
+			#if defined(GRID_4)
+			voxelInfo = GetVoxelInfo4(worldPos);
+			#endif
 
-		float4 frag_debug_irradiance (v2f i) : SV_Target
-		{
-			// read low res depth and reconstruct world position
-			float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-			
-			//linearise depth		
-			float lindepth = Linear01Depth (depth);
-			
-			//get view and then world positions		
-			float4 viewPos = float4(i.cameraRay.xyz * lindepth, 1.0f);
-			float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;
+			#if defined(GRID_5)
+			voxelInfo = GetVoxelInfo5(worldPos);
+			#endif
 
-			float3 irradiance = GetVoxelIrradiance(GetVoxelPosition(worldPos));
-			return float4(irradiance, 1.0f);
-
-		}
-
-		float4 frag_lighting (v2f i) : SV_Target
-		{
-			float metallic = tex2D (_CameraGBufferTexture1, i.uv).r;
-
-			// read low res depth and reconstruct world position
-			float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-			
-			//linearise depth		
-			float lindepth = Linear01Depth (depth);
-			
-			//get view and then world positions		
-			float4 viewPos = float4(i.cameraRay.xyz * lindepth, 1.0f);
-			float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;
-
-			float4 gBufferSample = tex2D(_CameraGBufferTexture0, i.uv);
-			float3 albedo = gBufferSample.rgb;
-			float ao = gBufferSample.a;
-
-			float3 voxelIrradiance = GetVoxelIrradiance(GetVoxelPosition(worldPos));
-
-			float3 direct = tex2D(_MainTex, i.uv).rgb;
-			float3 indirect = (((ao * indirectLightingStrength * (1.0f - metallic)) / PI) * (albedo * voxelIrradiance));
-			float3 finalLighting = direct + indirect;
-
-			return float4(finalLighting, 1.0f);
-
+			float3 resultingColor = (voxelInfo.a > 0.0f ? voxelInfo.rgb : float3(0.0f, 0.0f, 0.0f));
+			return float4(resultingColor, 1.0f);
 		}
 
 		ENDCG
@@ -217,48 +179,13 @@
 			ENDCG
 		}
 
-		// 1 : World Normal Writing pass
+		// 1 : Voxel Grid debug pass
 		Pass
 		{
 			CGPROGRAM
 			#pragma vertex vert
-			#pragma fragment frag_normal
-			ENDCG
-		}
-
-		// 2 : Progressive Debug pass
-		Pass
-		{
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag_debug_progressive
-			ENDCG
-		}
-
-		// 3 : Normal Debug pass
-		Pass
-		{
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag_debug_normal
-			ENDCG
-		}
-
-		// 4: Irradiance Debug pass
-		Pass
-		{
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag_debug_irradiance
-			ENDCG
-		}
-
-		// 3 : Lighting accumulation pass
-		Pass
-		{
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag_lighting
+			#pragma fragment frag_debug
+			#pragma multi_compile GRID_1 GRID_2 GRID_3 GRID_4 GRID_5
 			ENDCG
 		}
 	}

@@ -2,10 +2,7 @@
 #pragma kernel CSMain
 
 // Readable/Writable texture for storing the direct lighting and the occupied flag
-RWTexture3D<float4>			voxelGridProgressive;
-
-// Readable/Writable texture for storing the world normal
-RWTexture3D<float4>			voxelGridNormal;
+RWTexture3D<float4>			voxelGrid;
 
 // Texture for storing the color with direct lighting
 Texture2D<float4>			lightingTexture;
@@ -13,14 +10,8 @@ Texture2D<float4>			lightingTexture;
 // Texture for storing the world space position
 Texture2D<float4>			positionTexture;
 
-// Texture for storing the world space position
-Texture2D<float4>			normalTexture;
-
-// Depth till which voxels will be injected to prevent inaccurate VPLs
-float 						voxelizationDepth;
-
 // Variable representing the dimension of the voxel grid
-uint						voxelVolumeDimension;
+uint						voxelResolution;
 
 // World-space boundary of the voxel grid
 float 						worldVolumeBoundary;
@@ -31,7 +22,7 @@ inline uint3 GetVoxelPosition (float3 worldPosition)
 	float3 encodedPosition = worldPosition / worldVolumeBoundary;
 	encodedPosition += float3(1.0f, 1.0f, 1.0f);
 	encodedPosition /= 2.0f;
-	uint3 voxelPosition = (uint3)(encodedPosition * voxelVolumeDimension);
+	uint3 voxelPosition = (uint3)(encodedPosition * voxelResolution);
 	return voxelPosition;
 }
 
@@ -45,21 +36,14 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	// World space position
 	float3 worldPosition = positionTexture[id.xy].rgb;
 
-	// World space normal
-	float3 worldNormal = normalTexture[id.xy].rgb;
-
 	// Extract the pixel's depth
 	float lindepth = positionTexture[id.xy].a;
 
-	// Inject the current voxel's information into the grid
-	if (lindepth < voxelizationDepth)
-	{
-		uint3 voxelPosition = GetVoxelPosition(worldPosition);
+	uint3 voxelPosition = GetVoxelPosition(worldPosition);
 
-		if (voxelGridProgressive[voxelPosition].a < 0.1f)
-		{
-			voxelGridProgressive[voxelPosition] = float4(lightingColor, 1.0f);
-			voxelGridNormal[voxelPosition] = float4(worldNormal, 1.0f);
-		}
+	// Inject the current voxel's information into the grid
+	if (((lindepth < voxelGrid[voxelPosition].a) && (lindepth > 0.01f)) || (voxelGrid[voxelPosition].a == 0.0f))
+	{
+		voxelGrid[voxelPosition] = float4(lightingColor, lindepth);
 	}
 }
