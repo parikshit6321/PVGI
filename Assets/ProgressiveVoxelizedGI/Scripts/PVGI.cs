@@ -31,7 +31,7 @@ public class PVGI : MonoBehaviour {
 	public Vector2Int injectionTextureResolution = Vector2Int.zero;
 
 	[Header("Cone Trace Settings")]
-	public int maximumIterations = 50;
+	public float maximumIterations = 64.0f;
 
 	private RenderTexture lightingTexture = null;
 	private RenderTexture positionTexture = null;
@@ -40,11 +40,13 @@ public class PVGI : MonoBehaviour {
 
 	private RenderTextureDescriptor voxelGridDescriptorFloat4;
 
-	public RenderTexture voxelGrid1;
-	public RenderTexture voxelGrid2;
-	public RenderTexture voxelGrid3;
-	public RenderTexture voxelGrid4;
-	public RenderTexture voxelGrid5;
+	private RenderTexture voxelGrid1;
+	private RenderTexture voxelGrid2;
+	private RenderTexture voxelGrid3;
+	private RenderTexture voxelGrid4;
+	private RenderTexture voxelGrid5;
+
+	private float lengthOfCone = 0.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -176,11 +178,15 @@ public class PVGI : MonoBehaviour {
 	// This is called once per frame after the scene is rendered
 	void OnRenderImage (RenderTexture source, RenderTexture destination) {
 
-		pvgiMaterial.SetFloat ("worldVolumeBoundary", worldVolumeBoundary);
+		lengthOfCone = (32.0f * worldVolumeBoundary) / (highestVoxelResolution * Mathf.Tan (Mathf.PI / 6.0f));
+
 		pvgiMaterial.SetMatrix ("InverseViewMatrix", GetComponent<Camera>().cameraToWorldMatrix);
 		pvgiMaterial.SetMatrix ("InverseProjectionMatrix", GetComponent<Camera>().projectionMatrix.inverse);
-		pvgiMaterial.SetInt ("highestVoxelResolution", highestVoxelResolution);
+		pvgiMaterial.SetFloat ("worldVolumeBoundary", worldVolumeBoundary);
+		pvgiMaterial.SetFloat ("maximumIterations", maximumIterations);
 		pvgiMaterial.SetFloat ("indirectLightingStrength", indirectLightingStrength);
+		pvgiMaterial.SetFloat ("lengthOfCone", lengthOfCone);
+		pvgiMaterial.SetInt ("highestVoxelResolution", highestVoxelResolution);
 
 		Graphics.Blit (source, lightingTexture);
 		Graphics.Blit (source, positionTexture, pvgiMaterial, 0);

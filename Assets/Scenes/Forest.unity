@@ -560,37 +560,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4863961743422456, guid: 92255209cc9faa347a2ddb176f4686f7,
     type: 2}
   m_PrefabInternal: {fileID: 329034337}
---- !u!84 &42953586
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 32
-  m_Height: 32
-  m_AntiAliasing: 1
-  m_DepthFormat: 0
-  m_ColorFormat: 11
-  m_MipMap: 0
-  m_GenerateMips: 0
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 2
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 32
 --- !u!4 &55446642 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4552795718295360, guid: 717141579b6f87a4796b61779d0cf924,
@@ -4147,37 +4116,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4863961743422456, guid: 92255209cc9faa347a2ddb176f4686f7,
     type: 2}
   m_PrefabInternal: {fileID: 1381676274}
---- !u!84 &369025310
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 256
-  m_Height: 256
-  m_AntiAliasing: 1
-  m_DepthFormat: 0
-  m_ColorFormat: 11
-  m_MipMap: 0
-  m_GenerateMips: 0
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 2
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 256
 --- !u!1001 &369083740
 Prefab:
   m_ObjectHideFlags: 0
@@ -4564,37 +4502,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed2d8703a15987c4c9278ce888224389, type: 2}
   m_IsPrefabParent: 0
---- !u!84 &384366754
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 16
-  m_Height: 16
-  m_AntiAliasing: 1
-  m_DepthFormat: 0
-  m_ColorFormat: 11
-  m_MipMap: 0
-  m_GenerateMips: 0
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 2
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 16
 --- !u!4 &387020659 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4721262733696924, guid: a18365b93a6878d478f5b442c6c77067,
@@ -12460,37 +12367,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed2d8703a15987c4c9278ce888224389, type: 2}
   m_IsPrefabParent: 0
---- !u!84 &1149381828
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_DepthFormat: 0
-  m_ColorFormat: 11
-  m_MipMap: 0
-  m_GenerateMips: 0
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 2
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 128
 --- !u!1001 &1149987112
 Prefab:
   m_ObjectHideFlags: 0
@@ -15542,22 +15418,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff74cdcc03d29c4caa7bbcd9c92d5ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugMode: 1
+  debugMode: 0
   debugVoxelGrid: 0
   pvgiShader: {fileID: 4800000, guid: ec5387503f6f7d146b8c0fa0d7e00693, type: 3}
   voxelGridEntryShader: {fileID: 7200000, guid: 2d6775162e29a634f9ae9a76644d9a79,
     type: 3}
-  resolution: {x: 1920, y: 1080}
+  resolution: {x: 1280, y: 720}
   indirectLightingStrength: 1
-  worldVolumeBoundary: 50
+  worldVolumeBoundary: 200
   highestVoxelResolution: 256
   injectionTextureResolution: {x: 512, y: 512}
-  maximumIterations: 15
-  voxelGrid1: {fileID: 369025310}
-  voxelGrid2: {fileID: 1149381828}
-  voxelGrid3: {fileID: 2057916936}
-  voxelGrid4: {fileID: 42953586}
-  voxelGrid5: {fileID: 384366754}
+  maximumIterations: 64
 --- !u!1001 &1413720567
 Prefab:
   m_ObjectHideFlags: 0
@@ -22550,37 +22421,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4920539353058398, guid: a6da4ad0e6122194c9ac2d6d4ef0b0c3,
     type: 2}
   m_PrefabInternal: {fileID: 2049246479}
---- !u!84 &2057916936
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 64
-  m_Height: 64
-  m_AntiAliasing: 1
-  m_DepthFormat: 0
-  m_ColorFormat: 11
-  m_MipMap: 0
-  m_GenerateMips: 0
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 2
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 64
 --- !u!1001 &2063838878
 Prefab:
   m_ObjectHideFlags: 0
