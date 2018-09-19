@@ -136,7 +136,7 @@ public class PVGI : MonoBehaviour {
 		voxelGridEntryShader.SetTexture(kernelHandle, "lightingTexture", lightingTexture);
 		voxelGridEntryShader.SetTexture(kernelHandle, "positionTexture", positionTexture);
 
-		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x, injectionTextureResolution.y, 1);
+		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x / 16, injectionTextureResolution.y / 16, 1);
 
 		// Updating voxel grid 2
 		voxelGridEntryShader.SetTexture(kernelHandle, "voxelGrid", voxelGrid2);
@@ -145,7 +145,7 @@ public class PVGI : MonoBehaviour {
 		voxelGridEntryShader.SetTexture(kernelHandle, "lightingTexture", lightingTexture);
 		voxelGridEntryShader.SetTexture(kernelHandle, "positionTexture", positionTexture);
 
-		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x, injectionTextureResolution.y, 1);
+		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x / 16, injectionTextureResolution.y / 16, 1);
 
 		// Updating voxel grid 3
 		voxelGridEntryShader.SetTexture(kernelHandle, "voxelGrid", voxelGrid3);
@@ -154,7 +154,7 @@ public class PVGI : MonoBehaviour {
 		voxelGridEntryShader.SetTexture(kernelHandle, "lightingTexture", lightingTexture);
 		voxelGridEntryShader.SetTexture(kernelHandle, "positionTexture", positionTexture);
 
-		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x, injectionTextureResolution.y, 1);
+		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x / 16, injectionTextureResolution.y / 16, 1);
 
 		// Updating voxel grid 4
 		voxelGridEntryShader.SetTexture(kernelHandle, "voxelGrid", voxelGrid4);
@@ -163,7 +163,7 @@ public class PVGI : MonoBehaviour {
 		voxelGridEntryShader.SetTexture(kernelHandle, "lightingTexture", lightingTexture);
 		voxelGridEntryShader.SetTexture(kernelHandle, "positionTexture", positionTexture);
 
-		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x, injectionTextureResolution.y, 1);
+		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x / 16, injectionTextureResolution.y / 16, 1);
 
 		// Updating voxel grid 5
 		voxelGridEntryShader.SetTexture(kernelHandle, "voxelGrid", voxelGrid5);
@@ -172,7 +172,7 @@ public class PVGI : MonoBehaviour {
 		voxelGridEntryShader.SetTexture(kernelHandle, "lightingTexture", lightingTexture);
 		voxelGridEntryShader.SetTexture(kernelHandle, "positionTexture", positionTexture);
 
-		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x, injectionTextureResolution.y, 1);
+		voxelGridEntryShader.Dispatch(kernelHandle, injectionTextureResolution.x / 16, injectionTextureResolution.y / 16, 1);
 	}
 
 	// This is called once per frame after the scene is rendered

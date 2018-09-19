@@ -26,7 +26,7 @@ inline uint3 GetVoxelPosition (float3 worldPosition)
 	return voxelPosition;
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(16, 16, 1)]
 // Entry point of the voxelization compute shader
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
