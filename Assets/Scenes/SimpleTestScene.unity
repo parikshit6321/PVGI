@@ -615,11 +615,11 @@ MonoBehaviour:
   pvgiShader: {fileID: 4800000, guid: ec5387503f6f7d146b8c0fa0d7e00693, type: 3}
   voxelGridEntryShader: {fileID: 7200000, guid: 2d6775162e29a634f9ae9a76644d9a79,
     type: 3}
-  resolution: {x: 1920, y: 1080}
+  resolution: {x: 1280, y: 720}
   indirectLightingStrength: 1
-  worldVolumeBoundary: 850
-  highestVoxelResolution: 256
-  injectionTextureResolution: {x: 512, y: 512}
+  worldVolumeBoundary: 300
+  highestVoxelResolution: 64
+  injectionTextureResolution: {x: 64, y: 64}
   maximumIterations: 64
 --- !u!124 &725661633
 Behaviour:
